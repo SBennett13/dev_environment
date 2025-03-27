@@ -28,36 +28,36 @@ function ubuntu() {
 }
 
 function rhel() {
-  sudo dnf -y update
-  sudo dnf -y install yum-utils
-  sudo dnf config-manager --set-enabled crb
-  sudo dnf -y install cmake make git wget ninja-build gcc gettext glibc-gconv-extra unzip npm readline-devel
+  dnf -y update
+  dnf -y install yum-utils
+  dnf config-manager --set-enabled crb
+  dnf -y install cmake make git wget ninja-build gcc gettext glibc-gconv-extra unzip npm readline-devel
 
   # Neovim
   pushd "$install_dir"
   wget -qO- https://github.com/neovim/neovim/archive/refs/tags/v0.10.4.tar.gz | tar zx
   pushd "$install_dir/neovim-0.10.4"
   make CMAKE_BUILD_TYPE=RelWithDebInfo
-  sudo make install
+  make install
   popd
 
   # Lua
   wget -qO- https://www.lua.org/ftp/lua-5.1.tar.gz | tar zx
   pushd "$install_dir/lua-5.1"
-  sudo make linux && make install
+  make linux && make install
   popd
 
   # Luarocks
   dnf -y install ncurses-devel libevent-devel readline-devel
   wget -qO- https://luarocks.org/releases/luarocks-3.11.1.tar.gz | tar zx
   pushd "$install_dir/luarocks-3.11.1"
-  ./configure && make && sudo make install
+  ./configure && make && make install
   popd
 
   # fd
-  sudo dnf -y copr enable tkbcopr
-  sudo dnf -y install fd
-  sudo dnf clean all
+  dnf -y copr enable tkbcopr/fd
+  dnf -y install fd
+  dnf clean all
 }
 
 OS_ID_LIKE=$(. /etc/os-release && echo "$ID_LIKE")

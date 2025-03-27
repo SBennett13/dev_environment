@@ -1,10 +1,11 @@
 #!/bin/bash
+
 function ubuntu() {
-  apt -y install tmux
+  apt -y install git
 }
 
 function rhel() {
-  dnf -y install tmux
+  dnf -y install git
 }
 
 OS_ID_LIKE=$(. /etc/os-release && echo "$ID_LIKE")
@@ -17,5 +18,14 @@ else
   echo "Got ID_LIB $OS_ID_LIKE and ID $OS_ID, but that isn't implemented"
   exit 1
 fi
+
+if [ -d "$HOME/.liquidprompt" ]; then
+  rm -rf "$HOME/.liquidprompt"
+fi
+
+mkdir -p "$HOME/.liquidprompt"
+git clone --branch=stable https://github.com/liquidprompt/liquidprompt.git "$HOME/.liquidprompt/liquidprompt"
+
+# Config should be laid down by dotfiles
 
 exit 0
