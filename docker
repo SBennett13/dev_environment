@@ -1,0 +1,49 @@
+#!/bin/bash
+
+function ubuntu() {
+  ## https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+  sudo apt-get -y update
+  sudo apt-get -y install ca-certificates curl
+  sudo install -m 0755 -d /etc/apt/keyrings
+  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  sudo chmod a+r /etc/apt/keyrings/docker.asc
+  sudo groupadd docker
+  sudo usermod -aG docker $USER
+
+  # Add the repository to Apt sources:
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |
+    sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+  sudo apt-get -y update
+
+  # install
+  sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+}
+
+function rhel() {
+
+  sudo dnf -y install dnf-plugins-core
+  sudo dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+  sudo dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  sudo systemctl enable --now docker
+}
+
+OS_ID_LIKE=$(. /etc/os-release && echo "$ID_LIKE")
+OS_ID=$(. /etc/os-release && echo "$ID")
+if [[ "$OS_ID_LIKE" =~ rhel ]]; then
+  echo "Running Docker install for RHEL"
+  rhel
+elif [[ "$OS_ID" =~ ubuntu ]]; then
+  echo "Running Docker install for Ubuntu"
+  ubuntu
+else
+  echo "Got ID_LIB $OS_ID_LIKE and ID $OS_ID, but that isn't implemented"
+  exit 1
+fi
+
+sudo usermod -aG docker $USER
+sudo groupadd docker
+newgrp docker
+
+exit 0
