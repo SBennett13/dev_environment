@@ -1,58 +1,19 @@
 #!/bin/bash
 
-version="v0.10.4"
+version="0.10.4"
 install_dir="/opt/"
 
 function ubuntu() {
   # installs
-  sudo apt -y install make curl cmake gettext lua5.1 liblua5.1.0-dev
-
-  # Neovim
-  git clone https://github.com/neovim/neovim.git $install_dir
-  git -C $install_dir fetch --all
-  git -C $install_dir checkout $version
-  make -C $install_dir clean
-  make -C $install_dir CMAKE_BUILD_TYPE=RelWithDebInfo
-  sudo make -C ~/neovim install
-
-  # Luarocks
-  wget https://luarocks.org/releases/luarocks-3.11.1.tar.gz
-  tar zxpf luarocks-3.11.1.tar.gz
-  cd luarocks-3.11.1
-  ./configure && make && sudo make install
-  sudo luarocks install luacheck
-
-  # config
-  mkdir -p $HOME/.config
-  git clone https://github.com/SBennett13/nvim.git $HOME/.config/nvim
+  apt update
+  apt -y install make curl cmake gettext fd-find wget ninja-build cmake build-essential libreadline-dev unzip npm python3-pip python3-venv
 }
 
 function rhel() {
   dnf -y update
   dnf -y install yum-utils
   dnf config-manager --set-enabled crb
-  dnf -y install cmake make git wget ninja-build gcc gettext glibc-gconv-extra unzip npm readline-devel
-
-  # Neovim
-  pushd "$install_dir"
-  wget -qO- https://github.com/neovim/neovim/archive/refs/tags/v0.10.4.tar.gz | tar zx
-  pushd "$install_dir/neovim-0.10.4"
-  make CMAKE_BUILD_TYPE=RelWithDebInfo
-  make install
-  popd
-
-  # Lua
-  wget -qO- https://www.lua.org/ftp/lua-5.1.tar.gz | tar zx
-  pushd "$install_dir/lua-5.1"
-  make linux && make install
-  popd
-
-  # Luarocks
-  dnf -y install ncurses-devel libevent-devel readline-devel
-  wget -qO- https://luarocks.org/releases/luarocks-3.11.1.tar.gz | tar zx
-  pushd "$install_dir/luarocks-3.11.1"
-  ./configure && make && make install
-  popd
+  dnf -y install cmake make git wget ninja-build gcc gettext glibc-gconv-extra unzip npm readline-devel ncurses-devel libevent-devel readline-devel
 
   # fd
   dnf -y copr enable tkbcopr/fd
@@ -70,5 +31,31 @@ else
   echo "Got ID_LIB $OS_ID_LIKE and ID $OS_ID, but that isn't implemented"
   exit 1
 fi
+
+# Neovim
+pushd "$install_dir"
+wget -qO- "https://github.com/neovim/neovim/archive/refs/tags/v$version.tar.gz" | tar zx
+pushd "neovim-$version"
+make CMAKE_BUILD_TYPE=RelWithDebInfo
+make install
+popd
+
+# Lua
+wget -qO- https://www.lua.org/ftp/lua-5.1.tar.gz | tar zx
+pushd lua-5.1
+make linux && make install
+popd
+
+# Luarocks
+wget -qO- https://luarocks.org/releases/luarocks-3.11.1.tar.gz | tar zx
+pushd "luarocks-3.11.1"
+./configure && make && make install
+popd
+
+mkdir "$HOME/config"
+git clone https://github.com/SBennett13/nvim.git "$HOME/.config/nvim"
+
+nvim --headless "+Lazy! sync" +qa
+nvim --headless +TSUpdate +qa
 
 exit 0
