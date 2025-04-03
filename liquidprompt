@@ -1,5 +1,12 @@
 #!/bin/bash
 
+install_dir="/opt/liquidprompt"
+if [[ -n "${LIQUIDPROMPT_INSTALL_DIR}" ]]; then
+  install_dir="${LIQUIDPROMPT_INSTALL_DIR}"
+fi
+
+echo "Installing Liquidprompt to ${LIQUIDPROMPT_INSTALL_DIR}"
+
 function ubuntu() {
   apt -y update
   apt -y install git
@@ -20,12 +27,12 @@ else
   exit 1
 fi
 
-if [ -d "$HOME/.liquidprompt" ]; then
-  rm -rf "$HOME/.liquidprompt"
+if [ -d "${LIQUIDPROMPT_INSTALL_DIR}" ]; then
+  rm -rf "${LIQUIDPROMPT_INSTALL_DIR}"
 fi
 
-mkdir -p "$HOME/.liquidprompt"
-git clone --branch=stable https://github.com/liquidprompt/liquidprompt.git "$HOME/.liquidprompt/liquidprompt"
+mkdir -p "${LIQUIDPROMPT_INSTALL_DIR}"
+git clone --branch=stable https://github.com/liquidprompt/liquidprompt.git "${LIQUIDPROMPT_INSTALL_DIR}"
 
 # Config should be laid down by dotfiles
 

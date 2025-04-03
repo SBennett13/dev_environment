@@ -2,15 +2,37 @@
 
 version="0.10.4"
 install_dir="/opt/"
+install_user="$(whoami)"
 
 if [[ -n "${NVIM_INSTALL_DIR}" ]]; then
   install_dir="${NVIM_INSTALL_DIR}"
-  mkdir -p "${isntall_dir}"
+  mkdir -p "${install_dir}"
 fi
 
 if [[ -n "${NVIM_INSTALL_VERSION}" ]]; then
   version="${NVIM_INSTALL_VERSION}"
 fi
+
+if [[ -n "${NVIM_INSTALL_USER}" ]]; then
+  echo "${NVIM_INSTALL_USER} set as install user"
+  install_user="${NVIM_INSTALL_USER}"
+fi
+
+if [[ "$install_user" =~ ^root$ ]]; then
+  config_dir="/root/.config"
+else
+  config_dir=$(realpath /~${install_user})
+  config_dir="${config_dir}/.config"
+fi
+echo "Installing Neovim v${version} to ${install_dir} and cloning config to ${config_dir}/nvim"
+
+pushd() {
+  command pushd "$@" >/dev/null
+}
+
+popd() {
+  command popd "$@" >/dev/null
+}
 
 function ubuntu() {
   # installs
@@ -62,10 +84,10 @@ pushd "luarocks-3.11.1"
 ./configure && make && make install
 popd
 
-mkdir "$HOME/config"
-git clone https://github.com/SBennett13/nvim.git "$HOME/.config/nvim"
+mkdir "${config_dir}"
+git clone https://github.com/SBennett13/nvim.git "${config_dir}/nvim"
 
-nvim --headless "+Lazy! sync" +qa
-nvim --headless +TSUpdate +qa
+su -l ${install_user} -c 'nvim --headless "+Lazy! sync" +qa'
+su -l ${install_user} -c 'nvim --headless +TSUpdate +qa'
 
 exit 0
