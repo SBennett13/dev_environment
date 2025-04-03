@@ -21,7 +21,7 @@ fi
 if [[ "$install_user" =~ ^root$ ]]; then
   config_dir="/root/.config"
 else
-  config_dir=$(realpath /~${install_user})
+  config_dir=$(realpath ~${install_user})
   config_dir="${config_dir}/.config"
 fi
 echo "Installing Neovim v${version} to ${install_dir} and cloning config to ${config_dir}/nvim"
