@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version="0.10.4"
+version="stable"
 install_dir="/opt/"
 install_user="$(whoami)"
 
@@ -24,7 +24,7 @@ else
   config_dir=$(realpath ~${install_user})
   config_dir="${config_dir}/.config"
 fi
-echo "Installing Neovim v${version} to ${install_dir} and cloning config to ${config_dir}/nvim"
+echo "Installing Neovim '${version}' to ${install_dir}"
 
 pushd() {
   command pushd "$@" >/dev/null
@@ -37,7 +37,7 @@ popd() {
 function ubuntu() {
   # installs
   apt update
-  apt -y install make curl cmake gettext fd-find wget ninja-build cmake build-essential libreadline-dev unzip npm python3-pip python3-venv
+  apt -y install make curl cmake gettext fd-find wget ninja-build cmake build-essential libreadline-dev unzip npm python3-pip python3-venv git
 }
 
 function rhel() {
@@ -64,11 +64,13 @@ else
   exit 1
 fi
 
-# Neovim
 pushd "$install_dir"
-wget -qO- "https://github.com/neovim/neovim/archive/refs/tags/v$version.tar.gz" | tar zx
-pushd "neovim-$version"
+# Neovim
+git clone git clone https://github.com/neovim/neovim
+pushd "$install_dir/neovim"
+git checkout stable
 make CMAKE_BUILD_TYPE=RelWithDebInfo
+chown -R $install_user: "$install_dir/neovim"
 make install
 popd
 
@@ -77,13 +79,17 @@ wget -qO- https://www.lua.org/ftp/lua-5.1.tar.gz | tar zx
 pushd lua-5.1
 make linux && make install
 popd
+chown -R $install_user: lua-5.1
 
 # Luarocks
 wget -qO- https://luarocks.org/releases/luarocks-3.11.1.tar.gz | tar zx
 pushd "luarocks-3.11.1"
 ./configure && make && make install
 popd
+chown -R $install_user: "$install_dir/luarocks-3.11.1"
+popd
 
+# Clone config
 mkdir "${config_dir}"
 git clone https://github.com/SBennett13/nvim.git "${config_dir}/nvim"
 
