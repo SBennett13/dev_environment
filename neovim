@@ -36,21 +36,21 @@ popd() {
 
 function ubuntu() {
   # installs
-  apt update
-  apt -y install make curl cmake gettext fd-find wget ninja-build cmake build-essential libreadline-dev unzip npm python3-pip python3-venv git
+  sudo apt update
+  sudo apt -y install make curl cmake gettext fd-find wget ninja-build cmake build-essential libreadline-dev unzip npm python3-pip python3-venv git
 }
 
 function rhel() {
-  dnf -y update
-  dnf -y install yum-utils
-  dnf config-manager --set-enabled crb
-  dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
-  dnf -y install cmake make git wget ninja-build gcc gettext glibc-gconv-extra unzip npm readline-devel ncurses-devel libevent-devel readline-devel
+  sudo dnf -y update
+  sudo dnf -y install yum-utils
+  sudo dnf config-manager --set-enabled crb
+  sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+  sudo dnf -y install cmake make git wget ninja-build gcc gettext glibc-gconv-extra unzip npm readline-devel ncurses-devel libevent-devel readline-devel
 
   # fd
-  dnf -y copr enable tkbcopr/fd
-  dnf -y install fd
-  dnf clean all
+  sudo dnf -y copr enable tkbcopr/fd
+  sudo dnf -y install fd
+  sudo dnf clean all
 }
 
 OS_ID_LIKE=$(. /etc/os-release && echo "$ID_LIKE")
@@ -66,7 +66,7 @@ fi
 
 pushd "$install_dir"
 # Neovim
-git clone git clone https://github.com/neovim/neovim
+git clone https://github.com/neovim/neovim
 pushd "$install_dir/neovim"
 git checkout stable
 make CMAKE_BUILD_TYPE=RelWithDebInfo
