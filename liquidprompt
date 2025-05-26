@@ -27,10 +27,6 @@ else
   exit 1
 fi
 
-if [ -d "${LIQUIDPROMPT_INSTALL_DIR}" ]; then
-  rm -rf "${LIQUIDPROMPT_INSTALL_DIR}"
-fi
-
 mkdir -p "${LIQUIDPROMPT_INSTALL_DIR}"
 git clone --branch=stable https://github.com/liquidprompt/liquidprompt.git "${LIQUIDPROMPT_INSTALL_DIR}"
 
